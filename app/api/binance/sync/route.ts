@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getBinanceClient } from '@/lib/binance/client'
 import { syncTrades, matchTradesAndCalculatePnL } from '@/lib/binance/trades'
 import getDatabase from '@/lib/db/database'
+import { config } from '@/lib/config'
 
 /**
  * POST /api/binance/sync
@@ -31,8 +32,9 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Initialize client
-        const client = getBinanceClient(true)
+        // Initialize client - use config network setting
+        const useTestnet = config.binance.network !== 'mainnet'
+        const client = getBinanceClient(useTestnet)
         client.initialize(user.encrypted_api_key, user.encrypted_api_secret)
 
         // Sync trades

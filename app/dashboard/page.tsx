@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Activity, TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle } from 'lucide-react'
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import type { DashboardMetrics } from '@/lib/db/schema'
 
 // For demo, using hardcoded userId=1. In production, get from auth.
@@ -11,11 +12,14 @@ export default function DashboardPage() {
     const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
     const [loading, setLoading] = useState(true)
     const [riskStatus, setRiskStatus] = useState<any>(null)
+    const [chartData, setChartData] = useState<any>(null)
+    const [chartPeriod, setChartPeriod] = useState<'7d' | '14d' | '30d' | '90d'>('30d')
 
     useEffect(() => {
         fetchDashboardData()
         fetchRiskStatus()
-    }, [])
+        fetchChartData()
+    }, [chartPeriod])
 
     async function fetchDashboardData() {
         try {
@@ -36,6 +40,16 @@ export default function DashboardPage() {
             setRiskStatus(data)
         } catch (error) {
             console.error('Failed to fetch risk status:', error)
+        }
+    }
+
+    async function fetchChartData() {
+        try {
+            const res = await fetch(`/api/analytics/chart?userId=${USER_ID}&period=${chartPeriod}`)
+            const data = await res.json()
+            setChartData(data)
+        } catch (error) {
+            console.error('Failed to fetch chart data:', error)
         }
     }
 
@@ -158,6 +172,82 @@ export default function DashboardPage() {
                                 pnl={metrics?.monthPnL || 0}
                             />
                         </div>
+
+                        {/* PnL Chart */}
+                        {chartData && chartData.chartData && chartData.chartData.length > 0 && (
+                            <div className="glass p-6 rounded-xl">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-2xl font-semibold text-white">PnL Grafiği</h2>
+                                    <div className="flex gap-2">
+                                        {(['7d', '14d', '30d', '90d'] as const).map((period) => (
+                                            <button
+                                                key={period}
+                                                onClick={() => setChartPeriod(period)}
+                                                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                                                    chartPeriod === period
+                                                        ? 'bg-primary-600 text-white'
+                                                        : 'glass text-gray-300 hover:bg-white/10'
+                                                }`}
+                                            >
+                                                {period}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <AreaChart data={chartData.chartData}>
+                                        <defs>
+                                            <linearGradient id="colorPnL" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                        <XAxis dataKey="date" stroke="#9ca3af" fontSize={12} />
+                                        <YAxis stroke="#9ca3af" fontSize={12} />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: '#1f2937',
+                                                border: '1px solid #374151',
+                                                borderRadius: '8px',
+                                            }}
+                                            labelStyle={{ color: '#fff' }}
+                                        />
+                                        <Area
+                                            type="monotone"
+                                            dataKey="cumulativePnL"
+                                            stroke="#0ea5e9"
+                                            strokeWidth={2}
+                                            fill="url(#colorPnL)"
+                                            name="Kümülatif PnL"
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Symbol Performance */}
+                        {chartData && chartData.symbolPerformance && chartData.symbolPerformance.length > 0 && (
+                            <div className="glass p-6 rounded-xl">
+                                <h2 className="text-2xl font-semibold text-white mb-6">Sembol Performansı</h2>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={chartData.symbolPerformance}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                        <XAxis dataKey="symbol" stroke="#9ca3af" fontSize={12} />
+                                        <YAxis stroke="#9ca3af" fontSize={12} />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: '#1f2937',
+                                                border: '1px solid #374151',
+                                                borderRadius: '8px',
+                                            }}
+                                            labelStyle={{ color: '#fff' }}
+                                        />
+                                        <Bar dataKey="total_pnl" fill="#0ea5e9" name="Toplam PnL (USDT)" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
 
                         {/* Quick Actions */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

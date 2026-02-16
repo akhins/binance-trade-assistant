@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getBinanceClient } from '@/lib/binance/client'
 import { encrypt, validateApiKey, validateApiSecret } from '@/lib/security/encryption'
 import getDatabase from '@/lib/db/database'
+import { config } from '@/lib/config'
 
 /**
  * POST /api/binance/connect
@@ -9,7 +10,7 @@ import getDatabase from '@/lib/db/database'
  */
 export async function POST(request: NextRequest) {
     try {
-        const { apiKey, apiSecret, userId, useTestnet = true } = await request.json()
+        const { apiKey, apiSecret, userId, useTestnet } = await request.json()
 
         // Validate input
         if (!apiKey || !apiSecret || !userId) {
@@ -38,8 +39,11 @@ export async function POST(request: NextRequest) {
         const encryptedApiKey = encrypt(apiKey)
         const encryptedApiSecret = encrypt(apiSecret)
 
-        // Test connection
-        const client = getBinanceClient(useTestnet)
+        // Test connection - use config network setting (mainnet by default)
+        const useTestnetNetwork = typeof useTestnet === 'boolean'
+            ? useTestnet
+            : config.binance.network !== 'mainnet'
+        const client = getBinanceClient(useTestnetNetwork)
         client.initialize(encryptedApiKey, encryptedApiSecret)
 
         const isConnected = await client.testConnection()
@@ -62,7 +66,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             message: 'Successfully connected to Binance',
-            testnet: useTestnet,
+            network: config.binance.network,
+            testnet: useTestnetNetwork,
         })
     } catch (error: any) {
         console.error('Binance connection error:', error)
@@ -101,9 +106,10 @@ export async function GET(request: NextRequest) {
             })
         }
 
-        // Test connection
+        // Test connection - use config network setting
         try {
-            const client = getBinanceClient(true)
+            const useTestnetNetwork = config.binance.network !== 'mainnet'
+            const client = getBinanceClient(useTestnetNetwork)
             client.initialize(user.encrypted_api_key, user.encrypted_api_secret)
             const isConnected = await client.testConnection()
 

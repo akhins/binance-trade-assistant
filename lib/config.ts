@@ -3,13 +3,14 @@
 export const config = {
     // Binance API
     binance: {
+        network: process.env.BINANCE_NETWORK === 'mainnet' ? 'mainnet' : 'testnet',
         testnet: {
             apiUrl: process.env.BINANCE_API_URL || 'https://testnet.binance.vision',
             wsUrl: process.env.BINANCE_WS_URL || 'wss://testnet.binance.vision/ws',
         },
         mainnet: {
-            apiUrl: 'https://api.binance.com/api',
-            wsUrl: 'wss://stream.binance.com:9443/ws',
+            apiUrl: process.env.BINANCE_MAINNET_API_URL || 'https://api.binance.com',
+            wsUrl: process.env.BINANCE_MAINNET_WS_URL || 'wss://stream.binance.com:9443/ws',
         },
         rateLimit: {
             requestsPerMinute: 1200,

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Key, Database, CheckCircle2, AlertCircle, Loader } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Key, Database, CheckCircle2, AlertCircle, Loader, RefreshCw, Brain, Bell } from 'lucide-react'
 
 const USER_ID = 1
 
@@ -11,6 +11,30 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(false)
     const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle')
     const [message, setMessage] = useState('')
+    const [autoSync, setAutoSync] = useState({ enabled: false, interval: 15, aiAnalysis: false })
+    const [loadingSettings, setLoadingSettings] = useState(true)
+
+    useEffect(() => {
+        fetchAutoSyncSettings()
+    }, [])
+
+    async function fetchAutoSyncSettings() {
+        try {
+            const res = await fetch(`/api/binance/auto-sync?userId=${USER_ID}`)
+            const data = await res.json()
+            if (data) {
+                setAutoSync({
+                    enabled: data.enabled || false,
+                    interval: data.interval || 15,
+                    aiAnalysis: data.aiAnalysis || false,
+                })
+            }
+        } catch (error) {
+            console.error('Failed to fetch auto-sync settings:', error)
+        } finally {
+            setLoadingSettings(false)
+        }
+    }
 
     async function handleConnect() {
         if (!apiKey || !apiSecret) {
@@ -30,7 +54,7 @@ export default function SettingsPage() {
                     apiKey,
                     apiSecret,
                     userId: USER_ID,
-                    useTestnet: true, // MVP için testnet kullan
+                    // useTestnet parametresini .env ayarına bırakıyoruz (config.binance.network)
                 }),
             })
 
@@ -50,6 +74,29 @@ export default function SettingsPage() {
             setMessage('Bir hata oluştu')
         } finally {
             setLoading(false)
+        }
+    }
+
+    async function updateAutoSyncSettings() {
+        try {
+            const res = await fetch('/api/settings/auto-sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: USER_ID,
+                    enabled: autoSync.enabled,
+                    interval: autoSync.interval,
+                    aiAnalysis: autoSync.aiAnalysis,
+                }),
+            })
+
+            const data = await res.json()
+            if (data.success) {
+                setMessage('Otomatik senkronizasyon ayarları güncellendi!')
+                setConnectionStatus('success')
+            }
+        } catch (error) {
+            console.error('Failed to update auto-sync settings:', error)
         }
     }
 
@@ -135,10 +182,88 @@ export default function SettingsPage() {
                         </h4>
                         <ul className="space-y-1 text-sm text-gray-300">
                             <li>• API anahtarlarınız AES 256-bit encryption ile şifrelenerek saklanır</li>
-                            <li>• Şu an Binance Testnet kullanılıyor (gerçek para riski yok)</li>
-                            <li>• Sadece "Read" ve "Trade" izinleri yeterlidir, "Withdraw" izni asla verilmemelidir</li>
+                            <li>• <strong className="text-yellow-400">GERÇEK BINANCE MAINNET</strong> kullanılıyor - Gerçek para ile işlem yapıyorsunuz!</li>
+                            <li>• Sadece "Read" ve "Trade" izinleri yeterlidir, <strong className="text-red-400">"Withdraw" izni ASLA verilmemelidir</strong></li>
                             <li>• API anahtarlarınızı hiçbir zaman başkalarıyla paylaşmayın</li>
+                            <li>• IP kısıtlaması eklemeniz şiddetle tavsiye edilir</li>
+                            <li>• Bu uygulama sizin adınıza işlem açmaz, sadece analiz yapar</li>
                         </ul>
+                    </div>
+                </div>
+
+                {/* Auto Sync Settings */}
+                <div className="glass p-8 rounded-xl space-y-6">
+                    <div className="flex items-center gap-3">
+                        <RefreshCw className="w-6 h-6 text-primary-400" />
+                        <h2 className="text-2xl font-semibold text-white">Otomatik Senkronizasyon</h2>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                            <div>
+                                <h3 className="font-semibold text-white mb-1">Otomatik Senkronizasyon</h3>
+                                <p className="text-sm text-gray-400">Binance'ten otomatik olarak trade'leri çek</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={autoSync.enabled}
+                                    onChange={(e) => {
+                                        setAutoSync({ ...autoSync, enabled: e.target.checked })
+                                        updateAutoSyncSettings()
+                                    }}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+
+                        {autoSync.enabled && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                        Senkronizasyon Aralığı (dakika)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="5"
+                                        max="60"
+                                        value={autoSync.interval}
+                                        onChange={(e) => {
+                                            const interval = parseInt(e.target.value)
+                                            if (interval >= 5 && interval <= 60) {
+                                                setAutoSync({ ...autoSync, interval })
+                                                updateAutoSyncSettings()
+                                            }
+                                        }}
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">5-60 dakika arası</p>
+                                </div>
+
+                                <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                                    <div>
+                                        <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
+                                            <Brain className="w-4 h-4 text-primary-400" />
+                                            Otomatik AI Analizi
+                                        </h3>
+                                        <p className="text-sm text-gray-400">Yeni trade'ler için otomatik AI analizi yap</p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={autoSync.aiAnalysis}
+                                            onChange={(e) => {
+                                                setAutoSync({ ...autoSync, aiAnalysis: e.target.checked })
+                                                updateAutoSyncSettings()
+                                            }}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 

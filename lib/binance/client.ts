@@ -45,7 +45,7 @@ export class BinanceClient {
     private rateLimiter: RateLimiter
     private useTestnet: boolean
 
-    constructor(useTestnet: boolean = true) {
+    constructor(useTestnet: boolean = config.binance.network !== 'mainnet') {
         this.useTestnet = useTestnet
         // Rate limiter: 1200 requests per minute
         this.rateLimiter = new RateLimiter(
@@ -70,6 +70,9 @@ export class BinanceClient {
             if (this.useTestnet) {
                 options.httpBase = config.binance.testnet.apiUrl
                 options.wsBase = config.binance.testnet.wsUrl
+            } else {
+                options.httpBase = config.binance.mainnet.apiUrl
+                options.wsBase = config.binance.mainnet.wsUrl
             }
 
             this.client = Binance(options)
@@ -226,10 +229,19 @@ let binanceClient: BinanceClient | null = null
 
 /**
  * Get Binance client instance
+ * Defaults to config.binance.network setting (mainnet or testnet)
  */
-export function getBinanceClient(useTestnet: boolean = true): BinanceClient {
+export function getBinanceClient(useTestnet?: boolean): BinanceClient {
+    // If not specified, use config setting
+    const shouldUseTestnet = useTestnet !== undefined 
+        ? useTestnet 
+        : config.binance.network !== 'mainnet'
+    
     if (!binanceClient) {
-        binanceClient = new BinanceClient(useTestnet)
+        binanceClient = new BinanceClient(shouldUseTestnet)
+    } else {
+        // Update if network changed
+        binanceClient = new BinanceClient(shouldUseTestnet)
     }
     return binanceClient
 }

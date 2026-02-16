@@ -128,6 +128,9 @@ export default function TradesPage() {
                                         <th className="px-6 py-4 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
                                             %
                                         </th>
+                                        <th className="px-6 py-4 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                            İşlem
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
@@ -169,6 +172,14 @@ export default function TradesPage() {
                                             <td className={`px-6 py-4 whitespace-nowrap text-right text-sm font-medium ${trade.pnl_percentage >= 0 ? 'text-green-400' : 'text-red-400'
                                                 }`}>
                                                 {trade.pnl_percentage >= 0 ? '+' : ''}{trade.pnl_percentage.toFixed(2)}%
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                                                <a
+                                                    href={`/trades/${trade.id}`}
+                                                    className="px-3 py-1 bg-primary-600/20 hover:bg-primary-600/30 text-primary-400 rounded-lg text-sm font-medium transition-all"
+                                                >
+                                                    Detay
+                                                </a>
                                             </td>
                                         </tr>
                                     ))}

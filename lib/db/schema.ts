@@ -5,6 +5,10 @@ export interface User {
     username: string
     encrypted_api_key?: string
     encrypted_api_secret?: string
+    auto_sync_enabled?: number // 0 or 1
+    auto_sync_interval?: number // minutes
+    auto_ai_analysis?: number // 0 or 1
+    last_sync_at?: string
     created_at: string
     updated_at: string
 }
