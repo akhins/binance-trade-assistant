@@ -114,6 +114,10 @@
     }
   }
 
+  .animate-gradient {
+    animation: gradient 3s ease infinite;
+  }
+
   /* Profit/Loss colors */
   .text-profit {
     @apply text-emerald-400;
@@ -186,7 +190,91 @@
 
 /* Card hover effect */
 .card-hover {
-  @apply transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-1;
+  @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/20 hover:scale-[1.02] hover:-translate-y-1;
+}
+
+/* Modern glass effect */
+.glass-modern {
+  @apply bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-xl border border-white/20 shadow-xl;
+}
+
+.glass-modern:hover {
+  @apply border-white/30 shadow-2xl;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Glow effect */
+.glow {
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 30px rgba(14, 165, 233, 0.5);
+}
+
+/* Smooth transitions */
+.smooth-transition {
+  @apply transition-all duration-500 ease-in-out;
+}
+
+/* Modern button */
+.btn-modern {
+  @apply relative overflow-hidden px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+  @apply before:absolute before:inset-0 before:bg-gradient-to-r before:from-primary-500/20 before:to-purple-500/20;
+  @apply before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradient border */
+.gradient-border {
+  position: relative;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(139, 92, 246, 0.1));
+  border-radius: 1rem;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 
 /* Typography improvements */

@@ -101,16 +101,18 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="min-h-screen p-6">
+        <div className="min-h-screen p-6 md:p-8">
             <div className="container mx-auto max-w-4xl space-y-8">
                 {/* Header */}
                 <div>
-                    <h1 className="text-4xl font-bold text-white">Ayarlar</h1>
-                    <p className="text-gray-400 mt-2">Binance bağlantısı ve uygulama ayarları</p>
+                    <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                        Ayarlar
+                    </h1>
+                    <p className="text-lg text-gray-400">Binance bağlantısı ve uygulama ayarları</p>
                 </div>
 
                 {/* Binance Connection */}
-                <div className="glass p-8 rounded-xl space-y-6">
+                <div className="glass-modern p-8 rounded-2xl space-y-6 border-white/20 shadow-xl">
                     <div className="flex items-center gap-3">
                         <Key className="w-6 h-6 text-primary-400" />
                         <h2 className="text-2xl font-semibold text-white">Binance API Bağlantısı</h2>
@@ -161,7 +163,7 @@ export default function SettingsPage() {
                         <button
                             onClick={handleConnect}
                             disabled={loading}
-                            className="w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+                            className="w-full px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/50 hover:shadow-primary-500/70 hover:scale-[1.02] disabled:hover:scale-100"
                         >
                             {loading ? (
                                 <>
@@ -192,7 +194,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Auto Sync Settings */}
-                <div className="glass p-8 rounded-xl space-y-6">
+                <div className="glass-modern p-8 rounded-2xl space-y-6 border-white/20 shadow-xl">
                     <div className="flex items-center gap-3">
                         <RefreshCw className="w-6 h-6 text-primary-400" />
                         <h2 className="text-2xl font-semibold text-white">Otomatik Senkronizasyon</h2>
@@ -268,7 +270,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Database Info */}
-                <div className="glass p-6 rounded-xl">
+                <div className="glass-modern p-6 rounded-2xl border-white/20 shadow-xl">
                     <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                         <Database className="w-5 h-5 text-primary-400" />
                         Veri Yönetimi

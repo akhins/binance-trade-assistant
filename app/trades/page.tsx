@@ -51,35 +51,38 @@ export default function TradesPage() {
     }
 
     return (
-        <div className="min-h-screen p-6">
+        <div className="min-h-screen p-6 md:p-8">
             <div className="container mx-auto max-w-7xl space-y-6">
                 {/* Header */}
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-4xl font-bold text-white">Trade Listesi</h1>
-                        <p className="text-gray-400 mt-2">Tüm işlemlerinizi görüntüleyin ve analiz edin</p>
+                        <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                            Trade Listesi
+                        </h1>
+                        <p className="text-lg text-gray-400">Tüm işlemlerinizi görüntüleyin ve analiz edin</p>
                     </div>
 
                     <button
                         onClick={syncFromBinance}
-                        className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-all flex items-center gap-2"
+                        className="group px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-primary-500/50 hover:shadow-primary-500/70 hover:scale-105"
                     >
-                        <TrendingUp className="w-5 h-5" />
+                        <TrendingUp className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
                         Binance'ten Senkronize Et
                     </button>
                 </div>
 
                 {/* Filters */}
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-3">
                     <div className="flex gap-2">
                         {(['ALL', 'OPEN', 'CLOSED'] as const).map((status) => (
                             <button
                                 key={status}
                                 onClick={() => setFilterStatus(status)}
-                                className={`px-4 py-2 rounded-lg font-medium transition-all ${filterStatus === status
-                                        ? 'bg-primary-600 text-white'
-                                        : 'glass text-gray-300 hover:bg-white/10'
-                                    }`}
+                                className={`px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 ${
+                                    filterStatus === status
+                                        ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/50'
+                                        : 'glass-modern text-gray-300 hover:bg-white/10 hover:text-white border-white/20'
+                                }`}
                             >
                                 {status === 'ALL' ? 'Tümü' : status === 'OPEN' ? 'Açık' : 'Kapalı'}
                             </button>
@@ -99,10 +102,10 @@ export default function TradesPage() {
                         <p className="text-gray-400">Binance'ten senkronize etmeyi deneyin</p>
                     </div>
                 ) : (
-                    <div className="glass rounded-xl overflow-hidden">
+                    <div className="glass-modern rounded-xl overflow-hidden border-white/20 shadow-xl">
                         <div className="overflow-x-auto custom-scrollbar">
                             <table className="w-full">
-                                <thead className="bg-white/5">
+                                <thead className="bg-gradient-to-r from-white/10 to-white/5">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                             Tarih
@@ -137,7 +140,7 @@ export default function TradesPage() {
                                     {trades.map((trade) => (
                                         <tr
                                             key={trade.id}
-                                            className="hover:bg-white/5 transition-colors"
+                                            className="hover:bg-white/10 transition-all duration-300 border-b border-white/5 last:border-0 group"
                                         >
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                                 {new Date(trade.opened_at).toLocaleDateString('tr-TR')}
@@ -176,9 +179,10 @@ export default function TradesPage() {
                                             <td className="px-6 py-4 whitespace-nowrap text-right">
                                                 <a
                                                     href={`/trades/${trade.id}`}
-                                                    className="px-3 py-1 bg-primary-600/20 hover:bg-primary-600/30 text-primary-400 rounded-lg text-sm font-medium transition-all"
+                                                    className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-primary-600/20 to-primary-700/20 hover:from-primary-600/30 hover:to-primary-700/30 text-primary-400 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/30"
                                                 >
                                                     Detay
+                                                    <span className="group-hover:translate-x-1 transition-transform">→</span>
                                                 </a>
                                             </td>
                                         </tr>

@@ -64,20 +64,25 @@ export default function DashboardPage() {
     const hasTrades = (metrics?.totalTrades || 0) > 0
 
     return (
-        <div className="min-h-screen p-6">
+        <div className="min-h-screen p-6 md:p-8">
             <div className="container mx-auto max-w-7xl space-y-8">
                 {/* Header */}
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-4xl font-bold text-white">Dashboard</h1>
-                        <p className="text-gray-400 mt-2">Trade performansınızın özeti</p>
+                        <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                            Dashboard
+                        </h1>
+                        <p className="text-lg text-gray-400">Trade performansınızın özeti</p>
                     </div>
 
                     <button
                         onClick={() => window.location.href = '/settings'}
-                        className="px-6 py-3 glass hover:bg-white/20 text-white rounded-lg transition-all"
+                        className="group px-6 py-3 glass-modern hover:bg-white/20 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/20 border-white/30 hover:border-primary-500/50"
                     >
-                        Ayarlar
+                        <span className="flex items-center gap-2">
+                            Ayarlar
+                            <span className="group-hover:translate-x-1 transition-transform">→</span>
+                        </span>
                     </button>
                 </div>
 
@@ -286,19 +291,24 @@ function MetricCard({ title, value, change, subtitle, icon, gradient }: {
     gradient: string
 }) {
     return (
-        <div className="relative p-6 rounded-2xl glass hover:bg-white/10 transition-all card-hover">
-            <div className={`absolute top-4 right-4 w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center text-white opacity-80`}>
+        <div className="group relative p-6 md:p-8 rounded-2xl glass-modern hover:bg-white/10 transition-all duration-500 card-hover overflow-hidden">
+            {/* Gradient glow effect */}
+            <div className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${gradient} rounded-full blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
+            
+            <div className={`absolute top-4 right-4 w-14 h-14 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center text-white shadow-lg opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300`}>
                 {icon}
             </div>
 
-            <div>
-                <p className="text-gray-400 text-sm mb-2">{title}</p>
-                <p className="text-3xl font-bold text-white mb-1">{value}</p>
-                {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+            <div className="relative z-10">
+                <p className="text-gray-400 text-sm mb-3 font-medium">{title}</p>
+                <p className="text-3xl md:text-4xl font-extrabold text-white mb-2">{value}</p>
+                {subtitle && <p className="text-xs text-gray-500 mb-2">{subtitle}</p>}
                 {change !== undefined && (
-                    <div className={`flex items-center gap-1 mt-2 ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {change >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                        <span className="text-sm font-medium">{Math.abs(change).toFixed(2)} USDT</span>
+                    <div className={`flex items-center gap-2 mt-3 ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <div className={`p-1.5 rounded-lg ${change >= 0 ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
+                            {change >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                        </div>
+                        <span className="text-sm font-semibold">{Math.abs(change).toFixed(2)} USDT</span>
                     </div>
                 )}
             </div>
@@ -310,11 +320,16 @@ function PeriodCard({ title, pnl }: { title: string; pnl: number }) {
     const isProfit = pnl >= 0
 
     return (
-        <div className="p-6 rounded-xl glass">
-            <p className="text-gray-400 text-sm mb-2">{title}</p>
-            <p className={`text-2xl font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                {isProfit ? '+' : ''}{pnl.toFixed(2)} USDT
-            </p>
+        <div className="group p-6 rounded-xl glass-modern hover:bg-white/10 transition-all duration-300 card-hover">
+            <p className="text-gray-400 text-sm mb-3 font-medium">{title}</p>
+            <div className="flex items-center gap-2">
+                <div className={`p-2 rounded-lg ${isProfit ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
+                    {isProfit ? <TrendingUp className="w-5 h-5 text-green-400" /> : <TrendingDown className="w-5 h-5 text-red-400" />}
+                </div>
+                <p className={`text-2xl md:text-3xl font-extrabold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                    {isProfit ? '+' : ''}{pnl.toFixed(2)} USDT
+                </p>
+            </div>
         </div>
     )
 }
@@ -328,14 +343,15 @@ function QuickAction({ title, description, href, icon }: {
     return (
         <a
             href={href}
-            className="p-6 rounded-xl glass hover:bg-white/10 transition-all card-hover group"
+            className="group relative p-6 rounded-xl glass-modern hover:bg-white/10 transition-all duration-300 card-hover overflow-hidden"
         >
-            <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary-600/20 flex items-center justify-center text-primary-400 group-hover:bg-primary-600/30 transition-all">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-500/0 to-purple-500/0 group-hover:from-primary-500/10 group-hover:to-purple-500/10 transition-all duration-300"></div>
+            <div className="flex items-start gap-4 relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-600/30 to-purple-600/30 flex items-center justify-center text-primary-400 group-hover:from-primary-500/40 group-hover:to-purple-500/40 group-hover:scale-110 transition-all duration-300 shadow-lg">
                     {icon}
                 </div>
                 <div>
-                    <h3 className="font-semibold text-white mb-1">{title}</h3>
+                    <h3 className="font-bold text-white mb-1 group-hover:text-primary-300 transition-colors">{title}</h3>
                     <p className="text-sm text-gray-400">{description}</p>
                 </div>
             </div>

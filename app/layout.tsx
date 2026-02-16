@@ -16,10 +16,15 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="tr" className="dark">
-            <body className={`${inter.className} min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900`}>
+        <html lang="tr" className="dark scroll-smooth">
+            <body className={`${inter.className} min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 antialiased`}>
+                <div className="fixed inset-0 -z-10">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(14,165,233,0.05),transparent_50%)]"></div>
+                </div>
                 <Navbar />
-                {children}
+                <main className="relative">
+                    {children}
+                </main>
             </body>
         </html>
     )
